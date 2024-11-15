@@ -662,7 +662,7 @@ inline void FFurStaticData::BuildFur(const FStaticMeshLODResources& LodRenderDat
 			FurSection.NumBones = 0;
 		}
 		check(Idx <= (uint32)Indices.Num());
-		Indices.RemoveAt(Idx, Indices.Num() - Idx, false);
+		Indices.RemoveAt(Idx, Indices.Num() - Idx, EAllowShrinking::No);
 
 		if (TempSections.Num())
 		{

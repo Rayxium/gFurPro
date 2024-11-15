@@ -1324,7 +1324,7 @@ inline void FFurSkinData::BuildFur(const FSkeletalMeshLODRenderData& LodRenderDa
 			FurSection.NumBones = SourceSection.BoneMap.Num();
 		}
 		check(Idx <= (uint32)Indices.Num());
-		Indices.RemoveAt(Idx, Indices.Num() - Idx, false);
+		Indices.RemoveAt(Idx, Indices.Num() - Idx, EAllowShrinking::No);
 		IndexBuffer.Unlock();
 
 		if (TempSections.Num())
