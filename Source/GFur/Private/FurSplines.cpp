@@ -92,7 +92,7 @@ void UFurSplines::ConvertToUniformControlPointCount(int32 NumControlPoints)
 		}
 	}
 	check(Idx == Temp.Num());
-	Temp.RemoveAt(Idx, Temp.Num() - Idx, true);
+	Temp.RemoveAt(Idx, Temp.Num() - Idx, EAllowShrinking::Yes);
 	Index.SetNum(0);
 	Count.SetNum(0);
 	Vertices = Temp;

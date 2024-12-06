@@ -10,9 +10,6 @@
 #include "Runtime/Engine/Public/DynamicMeshBuilder.h"
 #include "Runtime/Engine/Public/GPUSkinVertexFactory.h"
 #include "Runtime/Engine/Public/Rendering/SkeletalMeshRenderData.h"
-#include "Runtime/Engine/Public/SkeletalRenderPublic.h"
-#include "Runtime/Engine/Classes/Materials/Material.h"
-#include "Runtime/Engine/Classes/Materials/MaterialInstanceDynamic.h"
 #include "Runtime/Engine/Public/Materials/MaterialRenderProxy.h"
 #include "Runtime\Engine\Public\MaterialDomain.h"
 #include "MaterialShared.h"
@@ -29,6 +26,7 @@
 #include "ShaderParameterUtils.h"
 #include "FurSkinData.h"
 #include "FurStaticData.h"
+#include "SkeletalRenderPublic.h"
 
 #if RHI_RAYTRACING
 #include "RayTracingDefinitions.h"
@@ -314,10 +312,11 @@ public:
 
 #if RHI_RAYTRACING
 	virtual bool IsRayTracingRelevant() const override { return true; }
-	virtual void GetDynamicRayTracingInstances(FRayTracingMaterialGatheringContext& Context, TArray<FRayTracingInstance>& OutRayTracingInstances) override
+	virtual void GetDynamicRayTracingInstances(FRayTracingInstanceCollector& Collector) override
 	{
 		const auto& Sections = FurData[0]->GetSections_RenderThread();
-		if (RayTracingGeometry.RayTracingGeometryRHI.IsValid())
+		auto* RHI = RayTracingGeometry.GetRHI();
+		if (RHI != nullptr && RHI->IsValid())
 		{
 			FRayTracingInstance RayTracingInstance;
 			RayTracingInstance.Geometry = &RayTracingGeometry;
@@ -354,7 +353,7 @@ public:
 			//Deprecated
 
 			//RayTracingInstance.BuildInstanceMaskAndFlags(GetScene().GetFeatureLevel());
-			OutRayTracingInstances.Add(RayTracingInstance);
+			Collector.AddRayTracingInstance(RayTracingInstance);
 		}
 	}
 #endif
@@ -857,7 +856,6 @@ void UGFurComponent::updateFur()
 		d *= ForceFactor;
 		LinearOffset -= d;
 
-		FVector force;
 		FVector newOffset = (LinearVelocity * FMath::Sin(x) + (LinearOffset - FurForceFinal) * FMath::Cos(x)) * DampingFactor + FurForceFinal;
 		FVector newVelocity = (LinearVelocity * FMath::Cos(x) - (LinearOffset - FurForceFinal) * FMath::Sin(x)) * DampingFactor;
 		check(newOffset.X == newOffset.X && newOffset.Y == newOffset.Y && newOffset.Z == newOffset.Z);
